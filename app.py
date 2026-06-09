@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
+import os
 
 # --- Page Configuration ---
 st.set_page_config(
@@ -34,25 +35,30 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Data & Model Loading (Cached) ---
+# --- Data & Model Loading (Cached with Relative Paths) ---
 @st.cache_resource
 def load_model():
-    model_path = "mlruns/7/models/m-e8f1d99d3b5c4e86aa7b2f7152ae256d/artifacts/model.pkl"
-    try:
+    # RELATIVE PATH: Looks for the model in the same directory as app.py
+    # Change filename if your final model has a different name
+    model_path = "GradientBoosting_final_model.pkl" 
+    if os.path.exists(model_path):
         return joblib.load(model_path)
-    except FileNotFoundError:
-        return None
+    return None
 
 @st.cache_data
 def load_clean_schema():
-    csv_path = r"C:\Users\dell\Desktop\ML_Project\phone_addiction_dataset.csv"
+    # RELATIVE PATH: Expects the dataset in the same directory as app.py
+    csv_path = "phone_addiction_dataset.csv"
     try:
-        data = pd.read_csv(csv_path)
-        target_col = "Addiction_Level"
-        data = data.drop_duplicates().dropna(subset=[target_col])
-        columns_to_drop = ["Name", "Location"] 
-        data = data.drop(columns=columns_to_drop, errors="ignore")
-        return data.drop(columns=[target_col])
+        if os.path.exists(csv_path):
+            data = pd.read_csv(csv_path)
+            target_col = "Addiction_Level"
+            data = data.drop_duplicates().dropna(subset=[target_col])
+            columns_to_drop = ["Name", "Location"] 
+            data = data.drop(columns=columns_to_drop, errors="ignore")
+            return data.drop(columns=[target_col])
+        else:
+            return None
     except Exception as e:
         st.error(f"Error loading dataset schema: {e}")
         return None
@@ -65,10 +71,10 @@ X_schema = load_clean_schema()
 st.markdown('<div class="main-header">📱 Digital Wellbeing & Behavioral Analytics</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">Predictive Modeling Engine for Assessment of Smartphone Dependency Metrics</div>', unsafe_allow_html=True)
 
-if pipeline is None:
-    st.error("⚠️ **Model Engine Offline:** `GradientBoosting_final_model.pkl` could not be located in the working directory.")
-elif X_schema is None:
-    st.error("⚠️ **Schema Map Offline:** Unable to locate or parse the core database schema at the specified path.")
+if X_schema is None:
+    st.error("⚠️ **Schema Map Offline:** Unable to locate 'phone_addiction_dataset.csv' in the current working directory.")
+elif pipeline is None:
+    st.error("⚠️ **Model Engine Offline:** 'GradientBoosting_final_model.pkl' could not be located in the current working directory.")
 else:
     # Segregate metrics
     cat_cols = X_schema.select_dtypes(include=['object']).columns.tolist()
