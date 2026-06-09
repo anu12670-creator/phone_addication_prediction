@@ -40,7 +40,7 @@ st.markdown("""
 def load_model():
     # RELATIVE PATH: Looks for the model in the same directory as app.py
     # Change filename if your final model has a different name
-    model_path = "GradientBoosting_final_model.pkl" 
+    model_path = "" 
     if os.path.exists(model_path):
         return joblib.load(model_path)
     return None
