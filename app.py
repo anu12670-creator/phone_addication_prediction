@@ -35,20 +35,19 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- Data & Model Loading (Cached with Relative Paths) ---
+# --- Data & Model Loading (Cached with Reliable Paths) ---
 @st.cache_resource
 def load_model():
-    # RELATIVE PATH: Looks for the model in the same directory as app.py
-    # Change filename if your final model has a different name
-    model_path = "mlruns/7/models/m-e8f1d99d3b5c4e86aa7b2f7152ae256d/artifacts/model.pkl" 
+    # Direct path where project.py creates the pkl file
+    model_path = r"C:\Users\dell\Desktop\ML_Project\GradientBoosting_final_model.pkl"
     if os.path.exists(model_path):
         return joblib.load(model_path)
     return None
 
 @st.cache_data
 def load_clean_schema():
-    # RELATIVE PATH: Expects the dataset in the same directory as app.py
-    csv_path = "phone_addiction_dataset.csv"
+    # Direct path to your data source
+    csv_path = r"C:\Users\dell\Desktop\ML_Project\phone_addiction_dataset.csv"
     try:
         if os.path.exists(csv_path):
             data = pd.read_csv(csv_path)
@@ -72,9 +71,9 @@ st.markdown('<div class="main-header">📱 Digital Wellbeing & Behavioral Analyt
 st.markdown('<div class="sub-header">Predictive Modeling Engine for Assessment of Smartphone Dependency Metrics</div>', unsafe_allow_html=True)
 
 if X_schema is None:
-    st.error("⚠️ **Schema Map Offline:** Unable to locate 'phone_addiction_dataset.csv' in the current working directory.")
+    st.error("⚠️ **Schema Map Offline:** Unable to locate dataset file at 'C:\\Users\\dell\\Desktop\\ML_Project\\phone_addiction_dataset.csv'.")
 elif pipeline is None:
-    st.error("⚠️ **Model Engine Offline:** 'GradientBoosting_final_model.pkl' could not be located in the current working directory.")
+    st.error("⚠️ **Model Engine Offline:** 'GradientBoosting_final_model.pkl' could not be found. Please ensure project.py has run and generated this file in your folder.")
 else:
     # Segregate metrics
     cat_cols = X_schema.select_dtypes(include=['object']).columns.tolist()
